@@ -1,0 +1,15 @@
+{
+    "name": "luoxiaojun/javis",
+    "type": "project",
+    "require": {
+        "guzzlehttp/guzzle": "^6.3@dev",
+        "elasticsearch/elasticsearch": "^6.0"
+    },
+    "authors": [
+        {
+            "name": "luoxiaojun",
+            "email": "luoxiaojun1992@sina.cn"
+        }
+    ],
+    "minimum-stability": "dev"
+}
