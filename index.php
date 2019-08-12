@@ -123,8 +123,7 @@ function generateRelations() {
 
 generateRelations();
 
-//todo 开关
-// setInterval(generateRelations, 10000);
+setInterval(generateRelations, 60000);
 
        </script>
    </body>
