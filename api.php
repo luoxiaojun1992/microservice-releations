@@ -46,8 +46,9 @@ $services = [];
 $serviceNameCoordMapping = [];
 $relations = [];
 
-$startX = 300;
-$startY = 300;
+define('INIT_START_X', 300);
+$startX = INIT_START_X;
+$startY = 400;
 
 function parseServiceFromName($name)
 {
@@ -76,7 +77,7 @@ if (isset($arrData['hits']['total'])) {
                     $startX += 100;
                     if ($startX == 1000) {
                         $startY += 100;
-                        $startX = 300;
+                        $startX = INIT_START_X;
                     }
                 }
             }
