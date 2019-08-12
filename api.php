@@ -29,47 +29,17 @@ $arrData = $esClient->search(array(
                                     array(
                                         'term' =>
                                             array(
-                                                'kind.keyword' => 'SERVER',
+                                                'kind.keyword' => 'CLIENT',
                                             ),
                                     ),
                             ),
                     ),
             ),
-        'aggs' =>
-            array(
-                'chains' =>
-                    array(
-                        'terms' =>
-                            array(
-                                'field' => 'traceId.keyword',
-                                'size' => 1000,
-                            ),
-                        'aggs' =>
-                            array(
-                                'calls' =>
-                                    array(
-                                        'top_hits' =>
-                                            array(
-                                                'size' => 10,
-                                                '_source' =>
-                                                    array(
-                                                        'includes' => ['localEndpoint.serviceName', 'parentId'],
-                                                    ),
-                                                'sort' =>
-                                                    array(
-                                                        'timestamp' =>
-                                                            array(
-                                                                'order' => 'asc',
-                                                            ),
-                                                    ),
-                                            ),
-                                    ),
-                            ),
-                    ),
-            ),
+        'sort' => ['timestamp' => ['order' => 'desc']],
+        '_source' => ['localEndpoint.serviceName', 'name']
     ],
     'from' => 0,
-    'size' => 0,
+    'size' => 1000,
 ));
 
 $services = [];
@@ -79,55 +49,52 @@ $relations = [];
 $startX = 300;
 $startY = 300;
 
-if (isset($arrData['aggregations']['chains']['buckets'])) {
-    if (count($arrData['aggregations']['chains']['buckets']) > 0) {
-        $chains = $arrData['aggregations']['chains']['buckets'];
+function parseServiceFromName($name)
+{
+    $arr = explode('/', $name);
+    foreach ($arr as $key => $value) {
+        if ($value === 'api') {
+            return $arr[$key + 1];
+        }
+    }
 
-        foreach ($chains as $chain) {
-            if (isset($chain['calls']['hits']['hits'])) {
-                if (count($chain['calls']['hits']['hits']) > 0) {
-                    $calls = $chain['calls']['hits']['hits'];
+    return 'unknown';
+}
 
-                    foreach ($calls as $callIndex => $call) {
-                        if (!array_key_exists($call['_source']['localEndpoint']['serviceName'], $serviceNameCoordMapping)) {
-                            $services[] = [
-                                'name' => $call['_source']['localEndpoint']['serviceName'],
-                                'value' => [$startX, $startY],
-                            ];
-                            $serviceNameCoordMapping[$call['_source']['localEndpoint']['serviceName']] = [$startX, $startY];
-                            $startX += 100;
-                            if ($startX == 1000) {
-                                $startY += 100;
-                            }
-                        }
+if (isset($arrData['hits']['total'])) {
+    if ($arrData['hits']['total'] > 0) {
+        $calls = $arrData['hits']['hits'];
+        foreach ($calls as $callIndex => $call) {
+            $serviceNameList = [$call['_source']['localEndpoint']['serviceName'], parseServiceFromName($call['_source']['name'])];
+            foreach ($serviceNameList as $serviceName) {
+                if (!array_key_exists($serviceName, $serviceNameCoordMapping)) {
+                    $services[] = [
+                        'name' => $serviceName,
+                        'value' => [$startX, $startY],
+                    ];
+                    $serviceNameCoordMapping[$serviceName] = [$startX, $startY];
+                    $startX += 100;
+                    if ($startX == 1000) {
+                        $startY += 100;
+                        $startX = 300;
                     }
                 }
             }
         }
 
-        foreach ($chains as $chain) {
-            if (isset($chain['calls']['hits']['hits'])) {
-                if (count($chain['calls']['hits']['hits']) > 0) {
-                    $calls = $chain['calls']['hits']['hits'];
-
-                    foreach ($calls as $callIndex => $call) {
-                        if (isset($calls[$callIndex + 1])) {
-                            if ($calls[$callIndex + 1]['_source']['parentId'] != $call['_source']['parentId']) {
-                                $relation = [
-                                    'fromName' => $call['_source']['localEndpoint']['serviceName'],
-                                    'toName' => $calls[$callIndex + 1]['_source']['localEndpoint']['serviceName'],
-                                    'coords' => [
-                                        $serviceNameCoordMapping[$call['_source']['localEndpoint']['serviceName']],
-                                        $serviceNameCoordMapping[$calls[$callIndex + 1]['_source']['localEndpoint']['serviceName']],
-                                    ]
-                                ];
-                                if (!in_array($relation, $relations)) {
-                                    $relations[] = $relation;
-                                }
-                            }
-                        }
-                    }
-                }
+        foreach ($calls as $callIndex => $call) {
+            $fromServiceName = $call['_source']['localEndpoint']['serviceName'];
+            $toServiceName = parseServiceFromName($call['_source']['name']);
+            $relation = [
+                'fromName' => $fromServiceName,
+                'toName' => $toServiceName,
+                'coords' => [
+                    $serviceNameCoordMapping[$fromServiceName],
+                    $serviceNameCoordMapping[$toServiceName],
+                ]
+            ];
+            if (!in_array($relation, $relations)) {
+                $relations[] = $relation;
             }
         }
     }
