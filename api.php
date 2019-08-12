@@ -46,7 +46,7 @@ $services = [];
 $serviceNameCoordMapping = [];
 $relations = [];
 
-define('INIT_START_X', 500);
+define('INIT_START_X', 300);
 $startX = INIT_START_X;
 $startY = 300;
 
@@ -74,8 +74,8 @@ if (isset($arrData['hits']['total'])) {
                         'value' => [$startX, $startY],
                     ];
                     $serviceNameCoordMapping[$serviceName] = [$startX, $startY];
-                    $startX += 200;
-                    if ($startX >= 1000) {
+                    $startX += 300;
+                    if ($startX >= 1300) {
                         $startY += 100;
                         $startX = INIT_START_X;
                     }

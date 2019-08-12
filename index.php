@@ -32,8 +32,8 @@ function generateRelations() {
                     zlevel: 1,
                     effect: {
                         show: true,
-                        period: 2,
-                        trailLength: 0.7,
+                        period: 3,
+                        trailLength: 0.95,
                         color: '#fff',
                         symbolSize: 3
                     },
@@ -41,7 +41,7 @@ function generateRelations() {
                         normal: {
                             color: '#a6c84c',
                             width: 0,
-                            curveness: 0.7
+                            curveness: 0.5
                         }
                     },
                     data: relations
@@ -122,7 +122,9 @@ function generateRelations() {
 }
 
 generateRelations();
-setInterval(generateRelations, 10000);
+
+//todo 开关
+// setInterval(generateRelations, 10000);
 
        </script>
    </body>
