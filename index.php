@@ -41,7 +41,7 @@ function generateRelations() {
                         normal: {
                             color: '#a6c84c',
                             width: 0,
-                            curveness: 0.5
+                            curveness: 0.3
                         }
                     },
                     data: relations

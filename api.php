@@ -46,7 +46,7 @@ $services = [];
 $serviceNameCoordMapping = [];
 $relations = [];
 
-define('INIT_START_X', 300);
+define('INIT_START_X', 250);
 $startX = INIT_START_X;
 $startY = 300;
 
