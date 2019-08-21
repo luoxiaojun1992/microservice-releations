@@ -95,7 +95,6 @@ if (isset($arrData['hits']['total'])) {
                     $serviceNameCoordMapping[$toServiceName],
                 ]
             ];
-            //todo 不太严谨
             if (!isset($relationsDuplicatedMapping[$fromServiceName][$toServiceName])) {
                 $relations[] = $relation;
                 $relationsDuplicatedMapping[$fromServiceName][$toServiceName] = true;
