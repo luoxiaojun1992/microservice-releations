@@ -45,6 +45,7 @@ $arrData = $esClient->search(array(
 $services = [];
 $serviceNameCoordMapping = [];
 $relations = [];
+$relationsDuplicatedMapping = [];
 
 define('INIT_START_X', 250);
 $startX = INIT_START_X;
@@ -94,8 +95,10 @@ if (isset($arrData['hits']['total'])) {
                     $serviceNameCoordMapping[$toServiceName],
                 ]
             ];
-            if (!in_array($relation, $relations)) {
+            //todo 不太严谨
+            if (!isset($relationsDuplicatedMapping[$fromServiceName][$toServiceName])) {
                 $relations[] = $relation;
+                $relationsDuplicatedMapping[$fromServiceName][$toServiceName] = true;
             }
         }
     }
